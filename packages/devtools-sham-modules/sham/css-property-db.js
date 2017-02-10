@@ -1128,7 +1128,7 @@ var cssProperties = {
   "unicode-bidi": {
     inherited: false,
     supports: 0,
-    values: ["-moz-isolate", "-moz-isolate-override", "-moz-plaintext", "bidi-override", "embed", "inherit", "initial", "normal", "unset", ],
+    values: ["isolate", "isolate-override", "plaintext", "bidi-override", "embed", "inherit", "initial", "normal", "unset"],
   },
   "-moz-user-focus": {
     inherited: true,
