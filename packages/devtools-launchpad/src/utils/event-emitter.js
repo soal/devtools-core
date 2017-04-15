@@ -52,7 +52,6 @@ EventEmitter.prototype = {
    */
   once(event, listener) {
     let deferred = defer();
-
     let handler = (_, first, ...rest) => {
       this.off(event, handler);
       if (listener) {
@@ -82,9 +81,12 @@ EventEmitter.prototype = {
     }
     let listeners = this._eventEmitterListeners.get(event);
     if (listeners) {
-      this._eventEmitterListeners.set(event, listeners.filter(l => {
-        return l !== listener && l._originalListener !== listener;
-      }));
+      this._eventEmitterListeners.set(
+        event,
+        listeners.filter(l => {
+          return l !== listener && l._originalListener !== listener;
+        }),
+      );
     }
   },
 
@@ -93,8 +95,9 @@ EventEmitter.prototype = {
    * be sent to listener functions.
    */
   emit(event) {
-    if (!this._eventEmitterListeners
-        || !this._eventEmitterListeners.has(event)) {
+    if (
+      !this._eventEmitterListeners || !this._eventEmitterListeners.has(event)
+    ) {
       return;
     }
 
@@ -108,8 +111,10 @@ EventEmitter.prototype = {
 
       // If listeners were removed during emission, make sure the
       // event handler we're going to fire wasn't removed.
-      if (originalListeners === this._eventEmitterListeners.get(event) ||
-        this._eventEmitterListeners.get(event).some(l => l === listener)) {
+      if (
+        originalListeners === this._eventEmitterListeners.get(event) ||
+        this._eventEmitterListeners.get(event).some(l => l === listener)
+      ) {
         try {
           listener.apply(null, arguments);
         } catch (ex) {
@@ -119,7 +124,7 @@ EventEmitter.prototype = {
         }
       }
     }
-  }
+  },
 };
 
 module.exports = EventEmitter;
