@@ -57,10 +57,10 @@ WorkerDispatcher.prototype = {
       });
     };
   }
-}
+};
 
 function workerHandler(publicInterface: Object) {
-  return function workerHandler(msg: Message) {
+  return function workerHandlerCallback(msg: Message) {
     const { id, method, args } = msg.data;
     const response = publicInterface[method].apply(undefined, args);
     if (response instanceof Promise) {

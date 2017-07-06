@@ -47,19 +47,19 @@ describe("source-utils", () => {
   it("isContentScheme", () => {
     for (let url of CHROME_URLS) {
       expect(isContentScheme(url)).toBe(false);
-     }
-     for (let url of CONTENT_URLS) {
+    }
+    for (let url of CONTENT_URLS) {
       expect(isContentScheme(url)).toBe(true);
-     }
+    }
   });
 
   it("isChromeScheme", () => {
     for (let url of CHROME_URLS) {
       expect(isChromeScheme(url)).toBe(true);
-     }
-     for (let url of CONTENT_URLS) {
+    }
+    for (let url of CONTENT_URLS) {
       expect(isChromeScheme(url)).toBe(false);
-     }
+    }
   });
 
   it("isWASM", () => {
@@ -72,10 +72,10 @@ describe("source-utils", () => {
     expect(isDataScheme(dataURI)).toBe(true);
 
     for (let url of CHROME_URLS) {
-     expect(isDataScheme(url)).toBe(false);
+      expect(isDataScheme(url)).toBe(false);
     }
     for (let url of CONTENT_URLS) {
-     expect(isDataScheme(url)).toBe(false);
+      expect(isDataScheme(url)).toBe(false);
     }
   });
 
@@ -115,7 +115,8 @@ describe("source-utils", () => {
     });
 
     // Test shortening data URIs, stripping mime/charset
-    expect(getSourceNames("data:text/html;charset=utf-8,<!DOCTYPE html></html>")).toEqual({
+    const dataURI = "data:text/html;charset=utf-8,<!DOCTYPE html></html>";
+    expect(getSourceNames(dataURI)).toEqual({
       short: "data:<!DOCTYPE html></html>",
       long: "data:text/html;charset=utf-8,<!DOCTYPE html></html>",
       host: undefined

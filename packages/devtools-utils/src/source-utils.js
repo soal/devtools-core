@@ -2,7 +2,7 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-//TODO : Localize this (was l10n.getStr("frame.unknownSource"))
+// TODO : Localize this (was l10n.getStr("frame.unknownSource"))
 const UNKNOWN_SOURCE_STRING = "(unknown)";
 
 // Character codes used in various parsing helper functions.
@@ -47,18 +47,18 @@ const gSourceNamesStore = new Map();
 */
 
 function parseURL(location) {
- let url = gURLStore.get(location);
+  let url = gURLStore.get(location);
 
- if (url !== void 0) {
-   return url;
- }
+  if (url !== void 0) {
+    return url;
+  }
 
- try {
-   url = new URL(location);
+  try {
+    url = new URL(location);
    // The callers were generally written to expect a URL from
    // sdk/url, which is subtly different.  So, work around some
    // important differences here.
-   url = {
+    url = {
      href: url.href,
      protocol: url.protocol,
      host: url.host,
@@ -70,29 +70,29 @@ function parseURL(location) {
      username: url.username,
      password: url.password,
      origin: url.origin,
-   };
+    };
 
    // Definitions:
    // Example: https://foo.com:8888/file.js
    // `hostname`: "foo.com"
    // `host`: "foo.com:8888"
-   let isChrome = isChromeScheme(location);
+    let isChrome = isChromeScheme(location);
 
-   url.fileName = url.pathname ?
+    url.fileName = url.pathname ?
      (url.pathname.slice(url.pathname.lastIndexOf("/") + 1) || "/") :
      "/";
 
-   if (isChrome) {
-     url.hostname = null;
-     url.host = null;
-   }
+    if (isChrome) {
+      url.hostname = null;
+      url.host = null;
+    }
 
-   gURLStore.set(location, url);
-   return url;
- } catch (e) {
-   gURLStore.set(location, null);
-   return null;
- }
+    gURLStore.set(location, url);
+    return url;
+  } catch (e) {
+    gURLStore.set(location, null);
+    return null;
+  }
 }
 
 /**
@@ -112,72 +112,72 @@ function parseURL(location) {
 *             - "http://page.com/test.js#go?q=query" -> "page.com"
 */
 function getSourceNames(source) {
- let data = gSourceNamesStore.get(source);
+  let data = gSourceNamesStore.get(source);
 
- if (data) {
-   return data;
- }
+  if (data) {
+    return data;
+  }
 
- let short, long, host;
- const sourceStr = source ? String(source) : "";
+  let short, long, host;
+  const sourceStr = source ? String(source) : "";
 
  // If `data:...` uri
- if (isDataScheme(sourceStr)) {
-   let commaIndex = sourceStr.indexOf(",");
-   if (commaIndex > -1) {
+  if (isDataScheme(sourceStr)) {
+    let commaIndex = sourceStr.indexOf(",");
+    if (commaIndex > -1) {
      // The `short` name for a data URI becomes `data:` followed by the actual
      // encoded content, omitting the MIME type, and charset.
-     short = `data:${sourceStr.substring(commaIndex + 1)}`.slice(0, 100);
-     let result = { short, long: sourceStr };
-     gSourceNamesStore.set(source, result);
-     return result;
-   }
- }
+      short = `data:${sourceStr.substring(commaIndex + 1)}`.slice(0, 100);
+      let result = { short, long: sourceStr };
+      gSourceNamesStore.set(source, result);
+      return result;
+    }
+  }
 
  // If Scratchpad URI, like "Scratchpad/1"; no modifications,
  // and short/long are the same.
- if (isScratchpadScheme(sourceStr)) {
-   let result = { short: sourceStr, long: sourceStr };
-   gSourceNamesStore.set(source, result);
-   return result;
- }
+  if (isScratchpadScheme(sourceStr)) {
+    let result = { short: sourceStr, long: sourceStr };
+    gSourceNamesStore.set(source, result);
+    return result;
+  }
 
- const parsedUrl = parseURL(sourceStr);
+  const parsedUrl = parseURL(sourceStr);
 
- if (!parsedUrl) {
+  if (!parsedUrl) {
    // Malformed URI.
-   long = sourceStr;
-   short = sourceStr.slice(0, 100);
- } else {
-   host = parsedUrl.host;
+    long = sourceStr;
+    short = sourceStr.slice(0, 100);
+  } else {
+    host = parsedUrl.host;
 
-   long = parsedUrl.href;
-   if (parsedUrl.hash) {
-     long = long.replace(parsedUrl.hash, "");
-   }
-   if (parsedUrl.search) {
-     long = long.replace(parsedUrl.search, "");
-   }
+    long = parsedUrl.href;
+    if (parsedUrl.hash) {
+      long = long.replace(parsedUrl.hash, "");
+    }
+    if (parsedUrl.search) {
+      long = long.replace(parsedUrl.search, "");
+    }
 
-   short = parsedUrl.fileName;
+    short = parsedUrl.fileName;
    // If `short` is just a slash, and we actually have a path,
    // strip the slash and parse again to get a more useful short name.
    // e.g. "http://foo.com/bar/" -> "bar", rather than "/"
-   if (short === "/" && parsedUrl.pathname !== "/") {
-     short = parseURL(long.replace(/\/$/, "")).fileName;
-   }
- }
+    if (short === "/" && parsedUrl.pathname !== "/") {
+      short = parseURL(long.replace(/\/$/, "")).fileName;
+    }
+  }
 
- if (!short) {
-   if (!long) {
-     long = UNKNOWN_SOURCE_STRING;
-   }
-   short = long.slice(0, 100);
- }
+  if (!short) {
+    if (!long) {
+      long = UNKNOWN_SOURCE_STRING;
+    }
+    short = long.slice(0, 100);
+  }
 
- let result = { short, long, host };
- gSourceNamesStore.set(source, result);
- return result;
+  let result = { short, long, host };
+  gSourceNamesStore.set(source, result);
+  return result;
 }
 
 // For the functions below, we assume that we will never access the location
@@ -187,7 +187,7 @@ function getSourceNames(source) {
 // being content or chrome when processing the profile.
 
 function isColonSlashSlash(location, i = 0) {
- return location.charCodeAt(++i) === CHAR_CODE_COLON &&
+  return location.charCodeAt(++i) === CHAR_CODE_COLON &&
         location.charCodeAt(++i) === CHAR_CODE_SLASH &&
         location.charCodeAt(++i) === CHAR_CODE_SLASH;
 }
@@ -196,7 +196,7 @@ function isColonSlashSlash(location, i = 0) {
 * Checks for a Scratchpad URI, like "Scratchpad/1"
 */
 function isScratchpadScheme(location, i = 0) {
- return location.charCodeAt(i) === CHAR_CODE_CAP_S &&
+  return location.charCodeAt(i) === CHAR_CODE_CAP_S &&
         location.charCodeAt(++i) === CHAR_CODE_C &&
         location.charCodeAt(++i) === CHAR_CODE_R &&
         location.charCodeAt(++i) === CHAR_CODE_A &&
@@ -210,7 +210,7 @@ function isScratchpadScheme(location, i = 0) {
 }
 
 function isDataScheme(location, i = 0) {
- return location.charCodeAt(i) === CHAR_CODE_D &&
+  return location.charCodeAt(i) === CHAR_CODE_D &&
         location.charCodeAt(++i) === CHAR_CODE_A &&
         location.charCodeAt(++i) === CHAR_CODE_T &&
         location.charCodeAt(++i) === CHAR_CODE_A &&
@@ -218,103 +218,103 @@ function isDataScheme(location, i = 0) {
 }
 
 function isContentScheme(location, i = 0) {
- let firstChar = location.charCodeAt(i);
+  let firstChar = location.charCodeAt(i);
 
- switch (firstChar) {
+  switch (firstChar) {
    // "http://" or "https://"
-   case CHAR_CODE_H:
-     if (location.charCodeAt(++i) === CHAR_CODE_T &&
+    case CHAR_CODE_H:
+      if (location.charCodeAt(++i) === CHAR_CODE_T &&
          location.charCodeAt(++i) === CHAR_CODE_T &&
          location.charCodeAt(++i) === CHAR_CODE_P) {
-       if (location.charCodeAt(i + 1) === CHAR_CODE_S) {
-         ++i;
-       }
-       return isColonSlashSlash(location, i);
-     }
-     return false;
+        if (location.charCodeAt(i + 1) === CHAR_CODE_S) {
+          ++i;
+        }
+        return isColonSlashSlash(location, i);
+      }
+      return false;
 
    // "file://"
-   case CHAR_CODE_F:
-     if (location.charCodeAt(++i) === CHAR_CODE_I &&
+    case CHAR_CODE_F:
+      if (location.charCodeAt(++i) === CHAR_CODE_I &&
          location.charCodeAt(++i) === CHAR_CODE_L &&
          location.charCodeAt(++i) === CHAR_CODE_E) {
-       return isColonSlashSlash(location, i);
-     }
-     return false;
+        return isColonSlashSlash(location, i);
+      }
+      return false;
 
    // "app://"
-   case CHAR_CODE_A:
-     if (location.charCodeAt(++i) == CHAR_CODE_P &&
+    case CHAR_CODE_A:
+      if (location.charCodeAt(++i) == CHAR_CODE_P &&
          location.charCodeAt(++i) == CHAR_CODE_P) {
-       return isColonSlashSlash(location, i);
-     }
-     return false;
+        return isColonSlashSlash(location, i);
+      }
+      return false;
 
    // "blob:"
-   case CHAR_CODE_B:
-     if (
+    case CHAR_CODE_B:
+      if (
        location.charCodeAt(++i) == CHAR_CODE_L &&
        location.charCodeAt(++i) == CHAR_CODE_O &&
        location.charCodeAt(++i) == CHAR_CODE_B &&
        location.charCodeAt(++i) == CHAR_CODE_COLON
      ) {
-       return isContentScheme(location, i + 1);
-     }
-     return false;
+        return isContentScheme(location, i + 1);
+      }
+      return false;
 
-   default:
-     return false;
- }
+    default:
+      return false;
+  }
 }
 
 function isChromeScheme(location, i = 0) {
- let firstChar = location.charCodeAt(i);
+  let firstChar = location.charCodeAt(i);
 
- switch (firstChar) {
+  switch (firstChar) {
    // "chrome://"
-   case CHAR_CODE_C:
-     if (location.charCodeAt(++i) === CHAR_CODE_H &&
+    case CHAR_CODE_C:
+      if (location.charCodeAt(++i) === CHAR_CODE_H &&
          location.charCodeAt(++i) === CHAR_CODE_R &&
          location.charCodeAt(++i) === CHAR_CODE_O &&
          location.charCodeAt(++i) === CHAR_CODE_M &&
          location.charCodeAt(++i) === CHAR_CODE_E) {
-       return isColonSlashSlash(location, i);
-     }
-     return false;
+        return isColonSlashSlash(location, i);
+      }
+      return false;
 
    // "resource://"
-   case CHAR_CODE_R:
-     if (location.charCodeAt(++i) === CHAR_CODE_E &&
+    case CHAR_CODE_R:
+      if (location.charCodeAt(++i) === CHAR_CODE_E &&
          location.charCodeAt(++i) === CHAR_CODE_S &&
          location.charCodeAt(++i) === CHAR_CODE_O &&
          location.charCodeAt(++i) === CHAR_CODE_U &&
          location.charCodeAt(++i) === CHAR_CODE_R &&
          location.charCodeAt(++i) === CHAR_CODE_C &&
          location.charCodeAt(++i) === CHAR_CODE_E) {
-       return isColonSlashSlash(location, i);
-     }
-     return false;
+        return isColonSlashSlash(location, i);
+      }
+      return false;
 
    // "jar:file://"
-   case CHAR_CODE_J:
-     if (location.charCodeAt(++i) === CHAR_CODE_A &&
+    case CHAR_CODE_J:
+      if (location.charCodeAt(++i) === CHAR_CODE_A &&
          location.charCodeAt(++i) === CHAR_CODE_R &&
          location.charCodeAt(++i) === CHAR_CODE_COLON &&
          location.charCodeAt(++i) === CHAR_CODE_F &&
          location.charCodeAt(++i) === CHAR_CODE_I &&
          location.charCodeAt(++i) === CHAR_CODE_L &&
          location.charCodeAt(++i) === CHAR_CODE_E) {
-       return isColonSlashSlash(location, i);
-     }
-     return false;
+        return isColonSlashSlash(location, i);
+      }
+      return false;
 
-   default:
-     return false;
- }
+    default:
+      return false;
+  }
 }
 
 function isWASM(location, i = 0) {
- return (
+  return (
    // "wasm-function["
    location.charCodeAt(i) === CHAR_CODE_W &&
    location.charCodeAt(++i) === CHAR_CODE_A &&
@@ -345,12 +345,12 @@ function getSourceMappedFile(source) {
  // the characters after last "/".
  // If sourcemapped source is a Windowss path, return
  // the characters after last "\\".
- if (source.lastIndexOf("/") >= 0) {
-   source = source.slice(source.lastIndexOf("/") + 1);
- } else if (source.lastIndexOf("\\") >= 0) {
-   source = source.slice(source.lastIndexOf("\\") + 1);
- }
- return source;
+  if (source.lastIndexOf("/") >= 0) {
+    source = source.slice(source.lastIndexOf("/") + 1);
+  } else if (source.lastIndexOf("\\") >= 0) {
+    source = source.slice(source.lastIndexOf("\\") + 1);
+  }
+  return source;
 }
 
 module.exports = {
